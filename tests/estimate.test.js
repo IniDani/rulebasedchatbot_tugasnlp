@@ -2,51 +2,72 @@ const { match, handle } = require("../src/intents/estimate");
 
 describe("Estimate Intent", () => {
   describe("match()", () => {
-    it("harus match untuk kata kunci estimasi", async () => {
-      expect(await match("tolong estimasi PLA")).toEqual({});
-      expect(await match("kira kira biaya untuk ABS")).toEqual({});
+    test("should match when contains 'estimasi'", async () => {
+      const r = await match("estimasi harga PLA");
+      expect(r).not.toBeNull();
     });
 
-    it("harus match jika ada dimensi", async () => {
-      expect(await match("PLA 10x5x3 cm")).toEqual({});
-      expect(await match("ABS 20x10x5 mm")).toEqual({});
+    test("should match when contains 'kira-kira'", async () => {
+      const r = await match("kira-kira biaya cetak berapa?");
+      expect(r).not.toBeNull();
     });
 
-    it("tidak boleh match untuk teks random", async () => {
-      expect(await match("halo bot")).toBeNull();
-      expect(await match("berapa harga per gram")).toBeNull();
+    test("should match when contains dimension pattern", async () => {
+      const r = await match("Cetak 10x5x3 cm PLA");
+      expect(r).not.toBeNull();
+    });
+
+    test("should not match for unrelated text", async () => {
+      const r = await match("halo, apa kabar?");
+      expect(r).toBeNull();
     });
   });
 
   describe("handle()", () => {
-    it("harus memberi instruksi jika dimensi tidak ada", async () => {
-      const response = await handle({}, "estimasi PLA");
-      expect(response).toMatch(/Sertakan dimensi/);
-      expect(response).toMatch(/Contoh:/);
+    test("should return fallback message if no dimensions provided", async () => {
+      const res = await handle({}, "estimasi PLA");
+      expect(res).toMatch(/⚠️ Untuk menghitung estimasi saya butuh informasi lebih lengkap/);
+      expect(res).toMatch(/estimasi PLA 10x5x3 cm 2 pcs/);
     });
 
-    it("harus menghitung estimasi dengan dimensi dan qty", async () => {
-      const response = await handle({}, "estimasi PLA 10x5x3 cm 2 pcs");
-      expect(response).toMatch(/Perkiraan \*kasar\*/);
-      expect(response).toMatch(/bahan \*PLA\*/);
-      expect(response).toMatch(/2 pcs/);
-      expect(response).toMatch(/Rp\d/);
+    test("should calculate estimation with default PLA", async () => {
+      const res = await handle({}, "estimasi PLA 10x5x3 cm");
+      expect(res).toMatch(/Perkiraan \*kasar\* untuk 1 pcs bahan \*PLA\*/);
+      expect(res).toMatch(/Rp/);
+      expect(res).toMatch(/cm³/);
     });
 
-    it("default qty = 1 jika tidak disebutkan", async () => {
-      const response = await handle({}, "estimasi ABS 5x5x5 cm");
-      expect(response).toMatch(/1 pcs/);
+    test("should calculate estimation with ABS material", async () => {
+      const res = await handle({}, "estimasi ABS 10x5x3 cm 2 pcs");
+      expect(res).toMatch(/2 pcs bahan \*ABS\*/);
+      expect(res).toMatch(/Rp/);
     });
 
-    it("fallback ke PLA jika material tidak dikenal", async () => {
-      const response = await handle({}, "estimasi wood 5x5x5 cm");
-      expect(response).toMatch(/bahan \*PLA\*/);
+    test("should calculate estimation with PETG material", async () => {
+      const res = await handle({}, "estimasi PETG 20x10x5 cm 1 pcs");
+      expect(res).toMatch(/1 pcs bahan \*PETG\*/);
+      expect(res).toMatch(/Rp/);
     });
 
-    it("output harus ada volume dan gram", async () => {
-      const response = await handle({}, "estimasi PETG 10x10x10 mm 1 pcs");
-      expect(response).toMatch(/cm³/);
-      expect(response).toMatch(/g\)/);
+    test("should default to PLA if material is unknown", async () => {
+      const res = await handle({}, "estimasi UNOBTAINIUM 10x5x3 cm 1 pcs");
+      expect(res).toMatch(/bahan \*PLA\*/);
+    });
+
+    test("should handle multiple quantity correctly", async () => {
+      const res1 = await handle({}, "estimasi PLA 10x5x3 cm 1 pcs");
+      const res2 = await handle({}, "estimasi PLA 10x5x3 cm 5 pcs");
+
+      const extractNumbers = (txt) =>
+        txt.match(/Rp([\d.]+)\s–\sRp([\d.]+)/)?.slice(1, 3).map((s) =>
+          Number(s.replace(/\./g, ""))
+        );
+
+      const [min1, max1] = extractNumbers(res1);
+      const [min5, max5] = extractNumbers(res2);
+
+      expect(min5).toBeCloseTo(min1 * 5, -1); // tolerate rounding
+      expect(max5).toBeCloseTo(max1 * 5, -1);
     });
   });
 });

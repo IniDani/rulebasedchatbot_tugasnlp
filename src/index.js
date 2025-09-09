@@ -5,7 +5,7 @@ const { route } = require('./router');
 const client = new Client({ authStrategy: new LocalAuth() });
 
 client.on('qr', qr => qrcode.generate(qr, { small: true }));
-client.on('ready', () => console.log('Bot siap!'));
+client.on('ready', () => console.log('Whatsapp telah tersambung...'));
 
 client.on('message', async msg => {
   try {
@@ -13,7 +13,7 @@ client.on('message', async msg => {
     if (reply) await msg.reply(reply);
   } catch (e) {
     console.error("Error:", e);
-    await msg.reply("Maaf, ada kendala. Ketik *admin* untuk dibantu manusia 🙏");
+    await msg.reply("Maaf, bot mengalami kendala. Mohon tunggu sebentar 🙏");
   }
 });
 

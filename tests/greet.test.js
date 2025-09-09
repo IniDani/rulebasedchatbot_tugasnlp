@@ -32,13 +32,14 @@ describe("Greet Intent", () => {
       expect(response).toMatch(/Halo! Saya \*R3D Bot\*/);
     });
 
-    it("harus menampilkan semua menu utama (1–6)", () => {
+    it("harus menampilkan semua menu utama (1–7)", () => {
       expect(response).toMatch(/1\. \*Daftar Harga\*/);
       expect(response).toMatch(/2\. \*Kalkulator Estimasi\*/);
       expect(response).toMatch(/3\. \*Daftar Bahan\*/);
       expect(response).toMatch(/4\. \*Lokasi\*/);
       expect(response).toMatch(/5\. \*Jam Operasional\*/);
       expect(response).toMatch(/6\. \*Cara Pemesanan\*/);
+      expect(response).toMatch(/7\. \*Cek Promo\*/);
     });
 
     it("harus memberi instruksi tentang ketik menu", () => {

@@ -4,6 +4,7 @@ const estimate = require('./intents/estimate');
 const quotation = require('./intents/quotation');
 const status = require('./intents/status');
 const fallback = require('./intents/fallback');
+const location = require('./intents/location');
 
 const rules = [
   status,
@@ -11,6 +12,7 @@ const rules = [
   pricing,
   estimate,
   greet,
+  location,
   fallback
 ];
 

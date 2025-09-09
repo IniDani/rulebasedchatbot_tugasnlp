@@ -1,9 +1,10 @@
-const { extractDims, extractQty, extractMaterial } = require('../utils/extractors');
+const { extractDims, extractQty, extractMaterial } = require("../utils/extractors");
 
 async function match(text) {
-  const hasDim = !!extractDims(text);
   const hasKw = /\b(estimasi|kira.?kira)\b/i.test(text);
-  return (hasDim || hasKw) ? {} : null;
+  const hasDim = !!extractDims(text);
+
+  return (hasKw || hasDim) ? {} : null;
 }
 
 async function handle(_, text) {
@@ -25,13 +26,19 @@ async function handle(_, text) {
     "Nylon + Fiberglass": [2500, 5000],
   };
 
-  if (!dims) {
+  // 🔹 Fallback kalau tidak ada dimensi
+  if (!dims || dims.length < 3) {
     return (
-      "Bisa kasih *estimasi kasar*. Sertakan dimensi (L×W×H) dan jumlah ya.\n" +
-      "Contoh: \"estimasi PLA 10x5x3 cm 2 pcs\"."
+      "⚠️ Untuk menghitung estimasi saya butuh informasi lebih lengkap.\n\n" +
+      "Mohon sertakan format:\n" +
+      "👉 `estimasi [bahan] [LxWxH] cm [jumlah] pcs`\n\n" +
+      "Contoh:\n" +
+      "`estimasi PLA 10x5x3 cm 2 pcs`\n\n" +
+      "Bahan yang tersedia: PLA, ABS, PETG, TPU, Nylon, Resin, dll."
     );
   }
 
+  // 🔹 Hitung volume
   const vol_mm3 = dims.reduce((a, b) => a * b, 1);
   const vol_cm3 = vol_mm3 / 1000;
 
@@ -43,8 +50,12 @@ async function handle(_, text) {
   const maxEst = Math.round(grams * maxP) * qty;
 
   return (
-    `Perkiraan *kasar* untuk ${qty} pcs bahan *${mat}* (~${vol_cm3.toFixed(1)} cm³ ≈ ${grams.toFixed(1)} g):\n` +
-    `💰 Rp${minEst.toLocaleString('id-ID')} – Rp${maxEst.toLocaleString('id-ID')}\n\n` +
+    `Perkiraan *kasar* untuk ${qty} pcs bahan *${mat}* (~${vol_cm3.toFixed(
+      1
+    )} cm³ ≈ ${grams.toFixed(1)} g):\n` +
+    `💰 Rp${minEst.toLocaleString("id-ID")} – Rp${maxEst.toLocaleString(
+      "id-ID"
+    )}\n\n` +
     `Untuk estimasi lebih akurat, kirim file *.stl*.`
   );
 }

@@ -4,10 +4,14 @@ const estimate = require('./intents/estimate');
 const fallback = require('./intents/fallback');
 const location = require('./intents/location');
 const materials = require('./intents/materials');
+const operational = require('./intents/operational');
+const order = require('./intents/oder');
 
 const rules = [
   pricing,
   materials,
+  operational,
+  order,
   estimate,
   greet,
   location,

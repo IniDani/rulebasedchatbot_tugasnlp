@@ -12,6 +12,7 @@ async function handle() {
     "4. *Lokasi* percetakan\n\n" +
     "5. *Jam Operasional* percetakan\n\n" +
     "6. *Cara Pemesanan* layanan cetak 3D\n\n" +
+    "7. *Cek Promo* terkini\n\n" +
     "Ketik *menu* untuk menampilkan pilihan ini kapan saja."
   );
 }

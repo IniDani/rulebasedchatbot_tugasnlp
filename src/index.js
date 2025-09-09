@@ -1,7 +1,12 @@
+require("dotenv").config();
 const { Client, LocalAuth } = require("whatsapp-web.js");
 const qrcode = require("qrcode-terminal");
 const { route } = require("./router");
-const logger = require("./utils/logger"); // pakai Winston
+const logger = require("./utils/logger");
+const connectDB = require("./config/db");
+const ChatLog = require("./models/chatLog");
+
+connectDB();
 
 const client = new Client({
   authStrategy: new LocalAuth(),
@@ -18,25 +23,37 @@ client.on("ready", () => {
   logger.info("✅ WhatsApp bot telah tersambung...");
 });
 
-// 🔹 Message Event
+// Message Event
 client.on("message", async (msg) => {
   logger.info(`📩 Pesan dari ${msg.from}: ${msg.body}`);
 
+  let reply = null;
+
   try {
-    const reply = await route(msg.body, msg.hasMedia);
+    reply = await route(msg.body, msg.hasMedia);
 
     if (reply) {
       await msg.reply(reply);
       logger.debug(`💬 Balasan terkirim ke ${msg.from}: ${reply}`);
     }
   } catch (err) {
-    logger.error(`❌ Error saat memproses pesan dari ${msg.from}: ${err.message}`);
+    logger.error(`❌ Error saat memproses pesan: ${err.message}`);
+    reply = "Maaf, bot mengalami kendala. Mohon tunggu sebentar 🙏";
+    await msg.reply(reply);
+  }
 
-    try {
-      await msg.reply("Maaf, bot mengalami kendala. Mohon tunggu sebentar 🙏");
-    } catch (sendErr) {
-      logger.error(`❌ Gagal mengirim pesan error ke ${msg.from}: ${sendErr.message}`);
-    }
+  // 🔹 Simpan chat log ke Mongo
+  try {
+    await ChatLog.create({
+      from: msg.from,
+      to: msg.to,
+      message: msg.body,
+      reply: reply,
+      hasMedia: msg.hasMedia,
+    });
+    logger.debug(`📝 Chat log disimpan ke MongoDB (${msg.from})`);
+  } catch (dbErr) {
+    logger.error(`❌ Gagal menyimpan chat log: ${dbErr.message}`);
   }
 });
 

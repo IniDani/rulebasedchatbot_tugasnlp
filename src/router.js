@@ -8,8 +8,8 @@ const fallback = require('./intents/fallback');
 const rules = [
   status,
   quotation,
-  estimate,
   pricing,
+  estimate,
   greet,
   fallback
 ];

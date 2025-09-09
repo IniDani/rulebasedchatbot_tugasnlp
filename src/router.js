@@ -5,7 +5,7 @@ const fallback = require('./intents/fallback');
 const location = require('./intents/location');
 const materials = require('./intents/materials');
 const operational = require('./intents/operational');
-const order = require('./intents/oder');
+const order = require('./intents/order');
 
 const rules = [
   pricing,

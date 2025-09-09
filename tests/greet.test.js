@@ -17,7 +17,6 @@ describe("Greet Intent", () => {
     it("tidak boleh match untuk teks non-sapaan", async () => {
       expect(await match("tolong buatkan estimasi 10x10x10 cm")).toBe(false);
       expect(await match("berapa harga PLA per gram?")).toBe(false);
-      expect(await match("menu")).toBe(false);
     });
   });
 

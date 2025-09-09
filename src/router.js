@@ -6,10 +6,12 @@ const location = require('./intents/location');
 const materials = require('./intents/materials');
 const operational = require('./intents/operational');
 const order = require('./intents/order');
+const promo = require('./intents/promo');
 
 const rules = [
   pricing,
   materials,
+  promo,
   operational,
   order,
   estimate,

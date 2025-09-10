@@ -9,9 +9,9 @@ async function handle() {
     "1. *Daftar Harga* percetakan 3D\n" +
     "2. *Kalkulator Estimasi* cetak 3D\n" +
     "3. *Daftar Bahan* yang tersedia\n" +
-    "4. *Lokasi* percetakan\n\n" +
-    "5. *Jam Operasional* percetakan\n\n" +
-    "6. *Cara Pemesanan* layanan cetak 3D\n\n" +
+    "4. *Lokasi* percetakan\n" +
+    "5. *Jam Operasional* percetakan\n" +
+    "6. *Cara Pemesanan* layanan cetak 3D\n" +
     "7. *Cek Promo* terkini\n\n" +
     "Ketik *menu* untuk menampilkan pilihan ini kapan saja."
   );

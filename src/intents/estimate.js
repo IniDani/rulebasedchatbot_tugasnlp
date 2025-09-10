@@ -1,10 +1,14 @@
-const { extractDims, extractQty, extractMaterial } = require("../utils/extractors");
+const {
+  extractDims,
+  extractQty,
+  extractMaterial,
+} = require("../utils/extractors");
 
 async function match(text) {
   const hasKw = /\b(estimasi|kira.?kira)\b/i.test(text);
   const hasDim = !!extractDims(text);
 
-  return (hasKw || hasDim) ? {} : null;
+  return hasKw || hasDim ? {} : null;
 }
 
 async function handle(_, text) {
@@ -55,8 +59,7 @@ async function handle(_, text) {
     )} cm³ ≈ ${grams.toFixed(1)} g):\n` +
     `💰 Rp${minEst.toLocaleString("id-ID")} – Rp${maxEst.toLocaleString(
       "id-ID"
-    )}\n\n` +
-    `Untuk estimasi lebih akurat, kirim file *.stl*.`
+    )}\n\n`
   );
 }
 

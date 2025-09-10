@@ -1,16 +1,22 @@
 const greet = require('./intents/greet');
 const pricing = require('./intents/pricing');
 const estimate = require('./intents/estimate');
-const quotation = require('./intents/quotation');
-const status = require('./intents/status');
 const fallback = require('./intents/fallback');
+const location = require('./intents/location');
+const materials = require('./intents/materials');
+const operational = require('./intents/operational');
+const order = require('./intents/order');
+const promo = require('./intents/promo');
 
 const rules = [
-  status,
-  quotation,
-  estimate,
   pricing,
+  materials,
+  promo,
+  operational,
+  order,
+  estimate,
   greet,
+  location,
   fallback
 ];
 
